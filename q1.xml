@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+
+// sync on chanels
+
+chan get_hammer, put_hammer, get_mallet, put_mallet;
+
+</declaration>
+	<template>
+		<name x="5" y="5">Jobber</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id0" x="-374" y="85">
+			<name x="-357" y="76">do_hard</name>
+		</location>
+		<location id="id1" x="-187" y="0">
+			<name x="-170" y="-9">do_avg_hammer</name>
+		</location>
+		<location id="id2" x="-187" y="-153">
+			<name x="-178" y="-178">do_avg_mallet</name>
+		</location>
+		<location id="id3" x="-374" y="-221">
+			<name x="-357" y="-238">do_easy</name>
+		</location>
+		<location id="id4" x="-372" y="0">
+			<name x="-382" y="-34">hard</name>
+		</location>
+		<location id="id5" x="-374" y="-68">
+			<name x="-384" y="-102">avg</name>
+		</location>
+		<location id="id6" x="-374" y="-136">
+			<name x="-357" y="-153">easy</name>
+		</location>
+		<location id="id7" x="-501" y="-68">
+			<name x="-484" y="-93">begin</name>
+		</location>
+		<init ref="id7"/>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id7"/>
+			<nail x="-187" y="195"/>
+			<nail x="-544" y="195"/>
+			<nail x="-544" y="-42"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-357" y="-323">put_mallet!</label>
+			<nail x="-187" y="-323"/>
+			<nail x="-544" y="-323"/>
+			<nail x="-544" y="-110"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id7"/>
+			<nail x="-374" y="-263"/>
+			<nail x="-501" y="-263"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-476" y="119">put_hammer!</label>
+			<nail x="-374" y="119"/>
+			<nail x="-501" y="119"/>
+			<nail x="-501" y="-59"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="-365" y="25">get_hammer!</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id3"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-289" y="-51">get_hammer!</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-297" y="-110">get_mallet!</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id4"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id5"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id6"/>
+		</transition>
+	</template>
+	<template>
+		<name>Hammer</name>
+		<location id="id8" x="-705" y="-263">
+			<name x="-715" y="-297">taken</name>
+		</location>
+		<location id="id9" x="-918" y="-263">
+			<name x="-928" y="-297">free</name>
+		</location>
+		<init ref="id9"/>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-850" y="-348">put_hammer?</label>
+			<nail x="-807" y="-323"/>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-858" y="-195">get_hammer?</label>
+			<nail x="-807" y="-204"/>
+		</transition>
+	</template>
+	<template>
+		<name>Mallet</name>
+		<location id="id10" x="170" y="51">
+			<name x="162" y="17">taken</name>
+		</location>
+		<location id="id11" x="26" y="60">
+			<name x="17" y="26">free</name>
+		</location>
+		<init ref="id11"/>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id11"/>
+			<label kind="synchronisation" x="60" y="-8">put_mallet?</label>
+			<nail x="94" y="17"/>
+		</transition>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id10"/>
+			<label kind="synchronisation" x="60" y="94">get_mallet?</label>
+			<nail x="94" y="94"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Jbr1 = Jobber();
+Jbr2 = Jobber();
+Jbr3 = Jobber();
+// List one or more processes to be composed into a system.
+system Jbr1, Jbr2, Jbr3, Hammer, Mallet;
+    </system>
+	<queries>
+		<query>
+			<formula>E&lt;&gt; deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>A[] not (Jbr1.do_hard &amp;&amp; Jbr2.do_hard &amp;&amp; Jbr3.do_hard)
+			</formula>
+			<comment>MutEx: Never (Not in any of the future states) Jbr1 and Jbr 2 and Jbr 3 and Jbr 4 all will work_hard at same time.
+			</comment>
+		</query>
+		<query>
+			<formula>A[] Mallet.taken == (Jbr1.do_avg_mallet || Jbr2.do_avg_mallet || Jbr3.do_avg_mallet)
+			</formula>
+			<comment>Whenever mallet is taken, either Jbr1 is work_avg_mallet or Jbr2 is work_avg_mallet.
+			</comment>
+		</query>
+		<query>
+			<formula>A[] not deadlock
+			</formula>
+			<comment>We are checking the possible deadlock here.
+			</comment>
+		</query>
+	</queries>
+</nta>
